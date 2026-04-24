@@ -50,6 +50,31 @@ jobs:
                 login_timeout: 30
           EOF
 
+      - name: Test connection
+        run: |
+          python -c "
+          import pyodbc
+          server = 'bqh7d7wmlwmelf7nmy6cxtscuu-xo4jnpiynodufcb6pfqliax3vu.datawarehouse.fabric.microsoft.com'
+          database = 'Energy_dw'
+          client_id = '${{ secrets.AZURE_CLIENT_ID }}'
+          tenant_id = '${{ secrets.AZURE_TENANT_ID }}'
+          client_secret = '${{ secrets.AZURE_CLIENT_SECRET }}'
+          conn_str = (
+              f'DRIVER={{ODBC Driver 18 for SQL Server}};'
+              f'SERVER={server};'
+              f'DATABASE={database};'
+              f'Authentication=ActiveDirectoryServicePrincipal;'
+              f'UID={client_id};'
+              f'PWD={client_secret};'
+              f'Login Timeout=30;'
+          )
+          conn = pyodbc.connect(conn_str)
+          cursor = conn.cursor()
+          cursor.execute('SELECT 1')
+          print('Connection successful:', cursor.fetchone())
+          conn.close()
+          "
+
       - name: Run dbt
         working-directory: energy_dbt
         run: dbt run --target prod
