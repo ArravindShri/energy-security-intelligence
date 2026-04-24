@@ -1,0 +1,9 @@
+country_id,country_name,eia_code,eia_name,world_bank_code,region,currency_code,has_stock_coverage
+1,India,IND,India,IND,Asia,INR,1
+2,Saudi Arabia,SAU,Saudi Arabia,SAU,Middle East,SAR,1
+3,Qatar,QAT,Qatar,QAT,Middle East,QAR,1
+4,Australia,AUS,Australia,AUS,Asia-Pacific,AUD,1
+5,China,CHN,China,CHN,Asia,CNY,0
+6,Germany,DEU,Germany,DEU,Europe,EUR,1
+7,USA,USA,United States,USA,Americas,USD,1
+8,Russia,RUS,Russia,RUS,Europe,RUB,0

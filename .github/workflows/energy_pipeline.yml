@@ -1,0 +1,47 @@
+name: Energy Security Pipeline
+
+on:
+  schedule:
+    - cron: '0 20 1-31/2 * *'   # Runs at 2AM IST on odd days
+  workflow_dispatch:              # Allows manual trigger
+
+jobs:
+  run-pipeline:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      
+      - name: Install dependencies
+        run: |
+          pip install requests dbt-fabric
+      
+      - name: Run Twelve Data ETL
+        env:
+          TWELVE_DATA_API_KEY: ${{ secrets.TWELVE_DATA_API_KEY }}
+        run: python etl/etl_twelve_data.py
+      
+      - name: Run Forex ETL
+        env:
+          TWELVE_DATA_API_KEY: ${{ secrets.TWELVE_DATA_API_KEY }}
+        run: python etl/etl_forex_rates.py
+      
+      - name: Run EIA ETL
+        env:
+          EIA_API_KEY: ${{ secrets.EIA_API_KEY }}
+        run: python etl/etl_eia_energy.py
+      
+      - name: Run World Bank ETL
+        run: python etl/etl_world_bank.py
+      
+      - name: Run dbt transformations
+        run: |
+          cd energy_dbt
+          dbt seed
+          dbt run

@@ -1,0 +1,11 @@
+version: 2
+
+sources:
+  - name: bronze
+    database: energy_lakehouse
+    schema: dbo
+    tables:
+      - name: bronze_stock_etf_prices
+      - name: bronze_forex_rates
+      - name: bronze_eia_energy
+      - name: bronze_world_bank_indicators

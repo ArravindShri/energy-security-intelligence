@@ -1,0 +1,5 @@
+crisis_id,crisis_name,start_date,end_date,is_ongoing,affected_region,crisis_type
+1,Saudi Oil Facility Attack,2019-09-14,2019-10-14,0,Middle East,Supply shock
+2,COVID-19 Demand Collapse,2020-03-01,2020-06-30,0,Global,Demand collapse
+3,Russia-Ukraine Energy Crisis,2022-02-24,2023-02-24,0,Europe,Geopolitical
+4,Iran-Israel Tensions,2024-10-01,,1,Middle East,Geopolitical

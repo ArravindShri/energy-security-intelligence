@@ -1,0 +1,17 @@
+ticker,company_name,country_id,category,asset_type,exchange,currency,primary_energy_product_id
+ONGC,Oil and Natural Gas Corporation,1,Oil,Stock,NSE,INR,1
+NTPC,NTPC Limited,1,Utility,Stock,NSE,INR,5
+ENR,Siemens Energy,6,Renewable,Stock,XETR,EUR,5
+RWE,RWE AG,6,Utility,Stock,XETR,EUR,5
+XOM,Exxon Mobil,7,Integrated,Stock,NYSE,USD,1
+NEE,NextEra Energy,7,Renewable,Stock,NYSE,USD,5
+WDS,Woodside Energy,4,Oil,Stock,NYSE,USD,1
+STOSF,Santos,4,Gas,Stock,OTC,USD,3
+KSA,iShares MSCI Saudi ETF,2,Country ETF,ETF,NYSE,USD,1
+QAT,iShares MSCI Qatar ETF,3,Country ETF,ETF,NASDAQ,USD,3
+XLE,Energy Select Sector SPDR,,Sector ETF,ETF,NYSE,USD,
+ICLN,iShares Global Clean Energy,,Sector ETF,ETF,NASDAQ,USD,
+VDE,Vanguard Energy,,Sector ETF,ETF,NYSE,USD,
+CL,WTI Crude Oil,,Commodity,Commodity,NYSE,USD,
+BZ,Brent Crude Oil,,Commodity,Commodity,NASDAQ,USD,
+NG,Natural Gas,,Commodity,Commodity,NYSE,USD,
