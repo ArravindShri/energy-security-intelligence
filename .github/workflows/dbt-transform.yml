@@ -1,0 +1,54 @@
+name: dbt-transform
+
+# WHEN to run
+on:
+  schedule:
+    - cron: '30 21 * * *'   # 3:00 AM IST (= 9:30 PM UTC)
+  workflow_dispatch:          # allows manual trigger from GitHub UI
+
+# WHAT to run
+jobs:
+  dbt-run:
+    runs-on: ubuntu-latest   # GitHub provides a fresh Linux machine
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install ODBC Driver 18
+        run: |
+          curl https://packages.microsoft.com/keys/microsoft.asc | sudo tee /etc/apt/trusted.gpg.d/microsoft.asc
+          curl https://packages.microsoft.com/config/ubuntu/22.04/prod.list | sudo tee /etc/apt/sources.list.d/mssql-release.list
+          sudo apt-get update
+          sudo ACCEPT_EULA=Y apt-get install -y msodbcsql18
+
+      - name: Install dbt-fabric
+        run: pip install dbt-fabric
+
+      - name: Create profiles.yml
+        run: |
+          mkdir -p ~/.dbt
+          cat > ~/.dbt/profiles.yml << 'EOF'
+          energy_dbt:
+            target: prod
+            outputs:
+              prod:
+                type: fabric
+                driver: "ODBC Driver 18 for SQL Server"
+                server: bqh7d7wmlwmelf7nmy6cxtscuu-xo4jnpiynodufcb6pfqliax3vu.datawarehouse.fabric.microsoft.com
+                database: Energy_dw
+                schema: dbo
+                authentication: ServicePrincipal
+                tenant_id: "${{ secrets.AZURE_TENANT_ID }}"
+                client_id: "${{ secrets.AZURE_CLIENT_ID }}"
+                client_secret: "${{ secrets.AZURE_CLIENT_SECRET }}"
+          EOF
+
+      - name: Run dbt
+        working-directory: energy_dbt
+        run: dbt run --target prod
