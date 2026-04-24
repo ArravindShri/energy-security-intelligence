@@ -47,6 +47,7 @@ jobs:
                 tenant_id: "${{ secrets.AZURE_TENANT_ID }}"
                 client_id: "${{ secrets.AZURE_CLIENT_ID }}"
                 client_secret: "${{ secrets.AZURE_CLIENT_SECRET }}"
+                login_timeout: 30
           EOF
 
       - name: Run dbt
