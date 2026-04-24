@@ -43,7 +43,7 @@ jobs:
                 server: bqh7d7wmlwmelf7nmy6cxtscuu-xo4jnpiynodufcb6pfqliax3vu.datawarehouse.fabric.microsoft.com
                 database: Energy_dw
                 schema: dbo
-                authentication: ServicePrincipal
+                authentication: ActiveDirectoryServicePrincipal
                 tenant_id: "${{ secrets.AZURE_TENANT_ID }}"
                 client_id: "${{ secrets.AZURE_CLIENT_ID }}"
                 client_secret: "${{ secrets.AZURE_CLIENT_SECRET }}"
