@@ -1,15 +1,13 @@
 name: dbt-transform
 
-# WHEN to run
 on:
   schedule:
-    - cron: '30 21 * * *'   # 3:00 AM IST (= 9:30 PM UTC)
-  workflow_dispatch:          # allows manual trigger from GitHub UI
+    - cron: '30 21 * * *'
+  workflow_dispatch:
 
-# WHAT to run
 jobs:
   dbt-run:
-    runs-on: ubuntu-latest   # GitHub provides a fresh Linux machine
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repo
@@ -27,8 +25,48 @@ jobs:
           sudo apt-get update
           sudo ACCEPT_EULA=Y apt-get install -y msodbcsql18
 
-      - name: Install dbt-fabric
-        run: pip install dbt-fabric
+      - name: Install dependencies
+        run: pip install dbt-fabric msal pyodbc
+
+      - name: Test connection with access token
+        env:
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+        run: |
+          python -c "
+          import os, struct, pyodbc
+          from msal import ConfidentialClientApplication
+
+          client_id = os.environ['AZURE_CLIENT_ID']
+          tenant_id = os.environ['AZURE_TENANT_ID']
+          client_secret = os.environ['AZURE_CLIENT_SECRET']
+
+          app = ConfidentialClientApplication(
+              client_id,
+              authority=f'https://login.microsoftonline.com/{tenant_id}',
+              client_credential=client_secret
+          )
+
+          result = app.acquire_token_for_client(scopes=['https://database.windows.net/.default'])
+
+          if 'access_token' not in result:
+              print('Auth failed:', result.get('error_description', 'Unknown error'))
+              exit(1)
+
+          token = result['access_token']
+          token_bytes = token.encode('utf-16-le')
+          token_struct = struct.pack(f'<I{len(token_bytes)}s', len(token_bytes), token_bytes)
+
+          server = 'bqh7d7wmlwmelf7nmy6cxtscuu-xo4jnpiynodufcb6pfqliax3vu.datawarehouse.fabric.microsoft.com'
+          conn_str = f'DRIVER={{ODBC Driver 18 for SQL Server}};SERVER={server};DATABASE=Energy_dw;'
+
+          conn = pyodbc.connect(conn_str, attrs_before={1256: token_struct})
+          cursor = conn.cursor()
+          cursor.execute('SELECT 1')
+          print('Connection successful:', cursor.fetchone())
+          conn.close()
+          "
 
       - name: Create profiles.yml
         run: |
@@ -49,31 +87,6 @@ jobs:
                 client_secret: "${{ secrets.AZURE_CLIENT_SECRET }}"
                 login_timeout: 30
           EOF
-
-      - name: Test connection
-        run: |
-          python -c "
-          import pyodbc
-          server = 'bqh7d7wmlwmelf7nmy6cxtscuu-xo4jnpiynodufcb6pfqliax3vu.datawarehouse.fabric.microsoft.com'
-          database = 'Energy_dw'
-          client_id = '${{ secrets.AZURE_CLIENT_ID }}'
-          tenant_id = '${{ secrets.AZURE_TENANT_ID }}'
-          client_secret = '${{ secrets.AZURE_CLIENT_SECRET }}'
-          conn_str = (
-              f'DRIVER={{ODBC Driver 18 for SQL Server}};'
-              f'SERVER={server};'
-              f'DATABASE={database};'
-              f'Authentication=ActiveDirectoryServicePrincipal;'
-              f'UID={client_id};'
-              f'PWD={client_secret};'
-              f'Login Timeout=30;'
-          )
-          conn = pyodbc.connect(conn_str)
-          cursor = conn.cursor()
-          cursor.execute('SELECT 1')
-          print('Connection successful:', cursor.fetchone())
-          conn.close()
-          "
 
       - name: Run dbt
         working-directory: energy_dbt
