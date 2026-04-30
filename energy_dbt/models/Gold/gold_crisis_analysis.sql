@@ -1,4 +1,7 @@
-{{ config(materialized='table') }}
+{{ config(
+    materialized='table',
+    pre_hook="DROP TABLE IF EXISTS dbo.gold_crisis_analysis"
+) }}
 WITH windows as (
     SELECT 
         sce.crisis_id as crisis_id,
