@@ -1,4 +1,4 @@
-{{ config(materialized='table') }}
+{{ config(materialized='view') }}
 WITH windows as (
     SELECT 
         sce.crisis_id as crisis_id,
