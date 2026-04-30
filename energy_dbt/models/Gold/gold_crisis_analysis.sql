@@ -1,7 +1,4 @@
-{{ config(
-    materialized='table',
-    pre_hook="DROP TABLE IF EXISTS dbo.gold_crisis_analysis"
-) }}
+{{ config(materialized='view') }}$
 WITH crisis_prices AS (
     SELECT * FROM {{ ref('int_crisis_prices') }}
 ),
