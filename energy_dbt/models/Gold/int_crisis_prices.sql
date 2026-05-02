@@ -23,10 +23,10 @@ crisis_prices AS (
         ssp.trade_date,
         ssp.close_price_usd
     FROM windows w
-    CROSS JOIN {{ ref('silver_stocks_reference') }} ssr
-    LEFT JOIN {{ ref('silver_stock_prices') }} ssp
+    INNER JOIN {{ ref('silver_stock_prices') }} ssp
+        ON ssp.trade_date BETWEEN w.analysis_window_start AND w.analysis_window_end
+    INNER JOIN {{ ref('silver_stocks_reference') }} ssr
         ON ssp.ticker = ssr.ticker
-        AND ssp.trade_date BETWEEN w.analysis_window_start AND w.analysis_window_end
 )
 
 SELECT * FROM crisis_prices
