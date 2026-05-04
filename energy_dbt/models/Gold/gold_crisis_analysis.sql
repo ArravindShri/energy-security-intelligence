@@ -1,4 +1,4 @@
-{{ config(materialized='view') }}
+{{ config(materialized='table') }}
 WITH crisis_prices AS (
     SELECT * FROM {{ ref('int_crisis_prices') }}
 ),
